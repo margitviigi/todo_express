@@ -46,8 +46,8 @@ app.post('/', (req, res) =>{
             "id": index,
             "task": req.body.task
         } 
-        console.log(newtask)
-        tasks.push(newtask)
+        console.log(newTask)
+        tasks.push(newTask)
 
         
         console.log(tasks)
