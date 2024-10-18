@@ -15,14 +15,14 @@ const readFile = (filename) => {
               console.error(err);
               return;
             }
-              const tasks = data.split('\n') 
+              const tasks = JSON.parse(data)
               resolve(tasks)
            });
     })
 } 
 
 app.get('/', (req, res)=> {
-    readFile('./tasks')
+    readFile('./tasks.json')
     .then((tasks) => {
         res.render('index',{tasks: tasks})
     })
@@ -33,14 +33,28 @@ app.get('/', (req, res)=> {
 app.post('/', (req, res) =>{
     console.log('form sent data')
     let task = req.body.task
-    readFile('./tasks')
+    readFile('./tasks.json')
     .then((tasks) => {
-        tasks.push(task)
-        console.log(tasks)
-        const data = tasks.join('\n')
-        const fs = require('node:fs');
+        let index
+        if(tasks.length === 0)
+        {
+            index = 0
+        } else {
+            index = [tasks.length -1].id +1; 
+        } 
+        const newTask = {
+            "id": index,
+            "task": req.body.task
+        } 
+        console.log(newtask)
+        tasks.push(newtask)
 
-fs.writeFile('./tasks', data, err => {
+        
+        console.log(tasks)
+        const data = JSON.stringify(tasks, null, 2)
+        console.log(data)
+
+fs.writeFile('./tasks.json', data, err => {
   if (err) {
     console.error(err);
   } else {
