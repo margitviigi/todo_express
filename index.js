@@ -67,10 +67,11 @@ app.post('/', (req, res) =>{
                 
             } 
             const newTask = {
-                "id": index,
-                "task": req.body.task
+                id: index,
+                task: task
             } 
             tasks.push(newTask)
+            console.log(tasks)
             const data = JSON.stringify(tasks, null, 2)
             writeFile('./tasks.json', data)
             res.redirect('/')           
@@ -79,10 +80,10 @@ app.post('/', (req, res) =>{
 
 });
 
-app.get('/delete-task/:taskId', (req, res) =>{
+app.get('/delete-task/:taskId', (req, res) => {
     let deletedTaskId = parseInt(req.params.taskId)
     readFile('./tasks.json')
-    .then (tasks =>  {
+    .then (tasks => {
         tasks.forEach((task, index) => {
             if(task.id === deletedTaskId){
                 tasks.splice(index, 1)
@@ -93,6 +94,54 @@ app.get('/delete-task/:taskId', (req, res) =>{
         res.redirect('/')
     });
 })
+app.get('/update-task/:taskId', (req, res) => {
+    let updateTaskId =  parseInt(req.params.taskId)
+    readFile('./tasks.json')
+      .then(tasks => {
+        let updateTask
+        tasks.forEach((task) => {
+            if(task.id === updateTaskId){
+                updateTask = task.task
+            }
+        });
+
+        res.render('update', {
+            updateTask: updateTask,
+            updateTaskId: updateTaskId,
+            error: null
+        } )
+    })
+})
+app.post('/update-task', (req, res) => {
+    console.log(req.body)
+    let updateTaskId = parseInt(req.params.taskId)
+    let updateTask = req.body.task
+    let error = null
+    if(updateTask.trim().length === 0){
+        error = 'Please insert correct task data'
+        res.render('update',{
+            updateTask: updateTask,
+            updateTaskId : updateTaskId,
+            error: error
+        })
+        } else {
+          readFile('./tasks.json')
+          .then(tasks => {
+             tasks.forEach((task, index) => {
+              if(task.id === updateTaskId){
+               tasks[index].task = updateTask
+        } 
+    } );
+    console.log(tasks)
+    const data = JSON.stringify(tasks, null, 2)
+    writeFile('./tasks.json', data)
+
+    res.redirect('/')
+})
+}
+})
+
+    
 
 app.get('/delete-tasks', (req, res) => {
     readFile('./tasks.json')
@@ -102,7 +151,7 @@ app.get('/delete-tasks', (req, res) => {
         writeFile('./tasks.json', data)
         res.redirect('/') 
     } )
-} )
+} ) 
 
 app.listen(3001, () => {
     console.log('Server is started http://localhost:3001')
